@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('USER')->after('email'); //ADMIN, ORGANIZER, USER
-            $table->string('status')->default('ACTIVE')->after('role'); //ACTIVE, PENDING, REJECTED, SUSPENDED
+            $table->string('role')->default('user')->after('email'); //ADMIN, ORGANIZER, USER
+            $table->string('status')->default('pending')->after('role'); //ACTIVE, PENDING, REJECTED, SUSPENDED
             $table->string('profile_photo')->nullable()->after('status');
         });
     }
