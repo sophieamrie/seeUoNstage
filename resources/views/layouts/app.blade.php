@@ -107,8 +107,8 @@
 
 
 {{-- MAIN CONTENT --}}
-<main>
-    @yield('content')
+<main class="container mt-5">
+    {{ $slot ?? '' }}
 </main>
 
 
@@ -117,3 +117,4 @@
 
 </body>
 </html>
+

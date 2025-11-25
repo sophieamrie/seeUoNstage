@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gradient-to-b from-purple-700 to-purple-900 text-white flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">seeUoNstage</h1>
+                <p class="text-purple-200 text-sm">Admin Panel</p>
+            </div>
+            
+            <nav class="mt-6">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-users mr-3"></i>
+                    Manage Users
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center px-6 py-3 bg-purple-800 border-l-4 border-white">
+                    <i class="fas fa-calendar-alt mr-3"></i>
+                    Manage Events
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Reports
+                </a>
+                <hr class="my-4 border-purple-600">
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <input type="hidden" name="redirect" value="{{ route('home') }}">
+                    <button type="submit" class="flex items-center px-6 py-3 hover:bg-purple-800 transition w-full text-left">
+                        <i class="fas fa-home mr-3"></i>
+                        Back to Website
+                    </button>
+                </form>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex items-center px-6 py-3 hover:bg-purple-800 transition w-full text-left">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-8 py-4">
+                    <h2 class="text-2xl font-semibold text-gray-800">Create New Event</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Welcome back,</p>
+                            <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-3xl">
+                    <div class="bg-white rounded-lg shadow">
+                        <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+                            @csrf
+
+                            <!-- Title -->
+                            <div>
+                                <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Event Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="title" name="title" value="{{ old('title') }}" required
+                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('title') border-red-500 @enderror"
+                                    placeholder="Enter event title">
+                                @error('title')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description <span class="text-red-500">*</span></label>
+                                <textarea id="description" name="description" rows="4" required
+                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('description') border-red-500 @enderror"
+                                    placeholder="Enter event description">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Category & Artist -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                                    <input type="text" id="category" name="category" value="{{ old('category') }}"
+                                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('category') border-red-500 @enderror"
+                                        placeholder="e.g., Concert, Sports">
+                                    @error('category')
+                                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="artist" class="block text-sm font-semibold text-gray-700 mb-2">Artist / Performer</label>
+                                    <input type="text" id="artist" name="artist" value="{{ old('artist') }}"
+                                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('artist') border-red-500 @enderror"
+                                        placeholder="e.g., John Doe">
+                                    @error('artist')
+                                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div>
+                                <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">Location <span class="text-red-500">*</span></label>
+                                <input type="text" id="location" name="location" value="{{ old('location') }}" required
+                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('location') border-red-500 @enderror"
+                                    placeholder="e.g., Jakarta Convention Center">
+                                @error('location')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Date & Time -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="start_datetime" class="block text-sm font-semibold text-gray-700 mb-2">Start Date & Time <span class="text-red-500">*</span></label>
+                                    <input type="datetime-local" id="start_datetime" name="start_datetime" value="{{ old('start_datetime') }}" required
+                                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('start_datetime') border-red-500 @enderror">
+                                    @error('start_datetime')
+                                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="end_datetime" class="block text-sm font-semibold text-gray-700 mb-2">End Date & Time <span class="text-red-500">*</span></label>
+                                    <input type="datetime-local" id="end_datetime" name="end_datetime" value="{{ old('end_datetime') }}" required
+                                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 @error('end_datetime') border-red-500 @enderror">
+                                    @error('end_datetime')
+                                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Event Image</label>
+                                <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-500 transition cursor-pointer" id="dropZone">
+                                    <div>
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                                        <p class="text-gray-700 font-medium">Click to upload or drag and drop</p>
+                                        <p class="text-gray-500 text-sm">PNG, JPG, GIF up to 2MB</p>
+                                    </div>
+                                    <input type="file" id="image_url" name="image_url" accept="image/*" class="hidden">
+                                </div>
+                                @error('image_url')
+                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Publish Checkbox -->
+                            <div>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="is_published" name="is_published" value="1" class="w-4 h-4 text-purple-600 rounded">
+                                    <span class="ml-2 text-gray-700">Publish event immediately</span>
+                                </label>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="flex gap-4 pt-6 border-t">
+                                <a href="{{ route('admin.events.index') }}" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition text-center">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition">
+                                    <i class="fas fa-plus mr-2"></i>Create Event
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('image_url');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-purple-500', 'bg-purple-50');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-purple-500', 'bg-purple-50');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-purple-500', 'bg-purple-50');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+            }
+        });
+    </script>
+</body>
+</html>

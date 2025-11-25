@@ -1,4 +1,5 @@
 <x-guest-layout>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -41,40 +42,18 @@
         <!-- Role Selection -->
         <div class="mt-6">
             <x-input-label for="role" :value="__('Register as')" />
-
-            <div class="mt-2 space-y-2">
-
-                <!-- User -->
-                <label class="flex items-center">
-                    <input type="radio" name="role" value="user"
-                           class="text-indigo-600 border-gray-300 focus:ring-indigo-500"
-                           {{ old('role', 'user') === 'user' ? 'checked' : '' }}>
-                    <span class="ml-3 text-gray-700">User (Regular Account)</span>
-                </label>
-
-                <!-- Organizer -->
-                <label class="flex items-center">
-                    <input type="radio" name="role" value="organizer"
-                           class="text-indigo-600 border-gray-300 focus:ring-indigo-500"
-                           {{ old('role') === 'organizer' ? 'checked' : '' }}>
-                    <span class="ml-3 text-gray-700">Organizer (Event Creator)</span>
-                </label>
-
-            </div>
-
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-
-            <!-- Auto Hint -->
-            <div id="organizer-hint"
-                 class="hidden mt-3 text-sm text-yellow-600 bg-yellow-100 border border-yellow-300 rounded p-3">
-                As an Organizer, your account must be reviewed and approved by an Administrator before you can access the Organizer Dashboard.
-            </div>
+            <label class="flex items-center mt-2">
+                <input type="radio" name="role" value="user" checked>
+                <span class="ml-3">User</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="role" value="organizer">
+                <span class="ml-3">Organizer</span>
+            </label>
         </div>
 
         <div class="flex items-center justify-end mt-6">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-               href="{{ route('login') }}">
+            <a class="underline text-sm" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
@@ -82,21 +61,7 @@
                 {{ __('Register') }}
             </x-primary-button>
         </div>
+
     </form>
 
-    <!-- Script for hint -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const roleInputs = document.querySelectorAll('input[name="role"]');
-            const hint = document.getElementById('organizer-hint');
-
-            function updateHint() {
-                const selected = document.querySelector('input[name="role"]:checked')?.value;
-                hint.classList.toggle('hidden', selected !== 'organizer');
-            }
-
-            roleInputs.forEach(input => input.addEventListener('change', updateHint));
-            updateHint();
-        });
-    </script>
 </x-guest-layout>

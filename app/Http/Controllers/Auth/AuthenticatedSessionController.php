@@ -34,8 +34,10 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
+
         $request->session()->regenerate();
         $user = Auth::user();
+
 
         //Role-based redirect
         if ($user->role === 'admin'){
@@ -49,7 +51,7 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route('organizer.dashboard');
         }
 
-        return redirect()->route('user.dashboard');
+        return redirect()->to('/');
     }
 
     /**

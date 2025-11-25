@@ -6,50 +6,29 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class AdminUserController extends Controller{
-    //list untuk semua organizer yang statusnya pending/approved/reject
-    public function index(){
-        //hanya tampilkan organizer
-        $pendingUsers = User::where('role', 'organizer')
-            ->where('status', 'pending')
-            ->get();
-
-        $approvedUsers = User::where('role', 'organizer')
-            ->where('status', 'approved')
-            ->get();
+class AdminUserController extends Controller
+{
+    public function index()
+    {
+        $users = User::latest()->paginate(15);
+        $pendingOrganizers = User::where('role', 'organizer')
+                                 ->where('status', 'pending')
+                                 ->get();
         
-        $rejectedUsers = User::where('role', 'organizer')
-            ->where('status', 'rejected')
-            ->get();
-
-        return view('admin.users.index', compact(
-            'pendingUsers',
-            'approvedUsers',
-            'rejectedUsers'
-        ));
+        return view('admin.users.index', compact('users', 'pendingOrganizers'));
     }
 
-    //approve organizer
-    public function approve(User $user){
-        if ($user->role !== 'organizer'){
-            abort(403, 'Not an organizer');
-        }
-
-        $user->status = 'approved';
-        $user->save();
-
-        return redirect()->back()->with('success', 'Organizer approved.');
+    public function approve(User $user)
+    {
+        $user->update(['status' => 'active']);
+        
+        return redirect()->back()->with('success', 'User approved successfully!');
     }
 
-    //reject organizer
-    public function reject(User $user){
-        if ($user->role !== 'organizer'){
-            abort(403, 'Not an organizer');
-        }
-
-        $user->status = 'rejected';
-        $user->save();
-
-        return redirect()->back()->with('success', 'organizer rejected');
+    public function reject(User $user)
+    {
+        $user->update(['status' => 'rejected']);
+        
+        return redirect()->back()->with('success', 'User rejected.');
     }
 }
