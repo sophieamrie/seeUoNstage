@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Ticket Types - Organizer</title>
+    <title>Manage Ticket Types - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,25 +13,29 @@
         <aside class="w-64 bg-gradient-to-b from-purple-700 to-purple-900 text-white flex-shrink-0">
             <div class="p-6">
                 <h1 class="text-2xl font-bold">seeUoNstage</h1>
-                <p class="text-purple-200 text-sm">Organizer Panel</p>
+                <p class="text-purple-200 text-sm">Admin Panel</p>
             </div>
             
             <nav class="mt-6">
-                <a href="{{ route('organizer.dashboard') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
                     <i class="fas fa-chart-line mr-3"></i>
                     Dashboard
                 </a>
-                <a href="{{ route('organizer.events.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-users mr-3"></i>
+                    Manage Users
+                </a>
+                <a href="{{ route('admin.events.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
                     <i class="fas fa-calendar-alt mr-3"></i>
                     Manage Events
                 </a>
-                <a href="{{ route('organizer.ticket-types.index') }}" class="flex items-center px-6 py-3 bg-purple-800 border-l-4 border-white">
+                <a href="{{ route('admin.ticket-types.index') }}" class="flex items-center px-6 py-3 bg-purple-800 border-l-4 border-white">
                     <i class="fas fa-ticket-alt mr-3"></i>
                     Ticket Types
                 </a>
-                <a href="{{ route('organizer.bookings.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
-                    <i class="fas fa-list mr-3"></i>
-                    Bookings
+                <a href="#" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Reports
                 </a>
                 <hr class="my-4 border-purple-600">
                 <a href="{{ route('home') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
@@ -55,7 +59,7 @@
                 <div class="flex items-center justify-between px-8 py-4">
                     <h2 class="text-2xl font-semibold text-gray-800">Manage Ticket Types</h2>
                     <div class="flex items-center space-x-4">
-                        <a href="{{ route('organizer.ticket-types.create') }}" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <a href="{{ route('admin.ticket-types.create') }}" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                             <i class="fas fa-plus mr-2"></i>Create Ticket Type
                         </a>
                         <div class="text-right">
@@ -97,6 +101,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ticket Type</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Event</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Organizer</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Quota</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remaining</th>
@@ -116,6 +121,9 @@
                                     </td>
                                     <td class="px-6 py-4 text-gray-600">
                                         {{ $ticket->event->title }}
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600">
+                                        {{ $ticket->event->organizer->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="px-2 py-1 text-sm bg-green-100 text-green-700 rounded">
@@ -138,10 +146,10 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('organizer.ticket-types.edit', $ticket) }}" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                            <a href="{{ route('admin.ticket-types.edit', $ticket) }}" class="text-blue-600 hover:text-blue-800" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form method="POST" action="{{ route('organizer.ticket-types.destroy', $ticket) }}" onsubmit="return confirm('Are you sure you want to delete this ticket type?');" class="inline">
+                                            <form method="POST" action="{{ route('admin.ticket-types.destroy', $ticket) }}" onsubmit="return confirm('Are you sure you want to delete this ticket type?');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-800" title="Delete">
@@ -167,7 +175,7 @@
                         </div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-2">No Ticket Types Yet</h3>
                         <p class="text-gray-600 mb-4">Create your first ticket type to get started</p>
-                        <a href="{{ route('organizer.ticket-types.create') }}" class="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                        <a href="{{ route('admin.ticket-types.create') }}" class="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                             <i class="fas fa-plus mr-2"></i>Create Ticket Type
                         </a>
                     </div>

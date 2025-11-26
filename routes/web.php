@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+//PUBLIC CONTROLLERS
+use App\Http\Controllers\EventCatalogController;
+
 // DASHBOARD CONTROLLERS
 use App\Models\Event;
 use App\Http\Controllers\Dashboard\AdminDashboardController;
@@ -16,6 +19,7 @@ use App\Http\Controllers\User\FavoriteController;
 // ADMIN CONTROLLERS
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminEventController;
+use App\Http\Controllers\Admin\AdminTicketController;
 
 // ORGANIZER CONTROLLERS
 use App\Http\Controllers\Organizer\EventController as OrganizerEventController;
@@ -36,6 +40,11 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('/events', [EventCatalogController::class, 'index'])->name('events.index');
+
+// Update this to use the controller
+Route::get('/events/{event}', [EventCatalogController::class, 'show'])->name('events.show');
+
 
 // =============================
 // USER DASHBOARD
@@ -55,25 +64,57 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     // USER FAVORITES
     Route::get('/favorites', [FavoriteController::class, 'index'])
         ->name('favorites.index');
+
+    Route::post('/favorites/{event}/toggle', [FavoriteController::class, 'toggle'])
+        ->name('favorites.toggle');
 });
 
 
 // =============================
-// ORGANIZER ROUTES
+// ORGANIZER ROUTES - PENDING PAGE (No status check)
 // =============================
 Route::middleware(['auth', 'role:organizer'])->group(function () {
-
-    Route::get('/organizer/dashboard', [OrganizerDashboardController::class, 'index'])
-        ->name('organizer.dashboard');
-
+    
+    // Pending page - accessible to all organizers regardless of status
     Route::get('/organizer/pending', [OrganizerPendingController::class, 'index'])
         ->name('organizer.pending');
 
+    // Delete account - only for rejected organizers
+    Route::post('/organizer/delete-account', [OrganizerPendingController::class, 'deleteAccount'])
+        ->name('organizer.deleteAccount');
+});
+
+
+// =============================
+// ORGANIZER ROUTES - ACTIVE ONLY (With status check)
+// =============================
+Route::middleware(['auth', 'role:organizer', 'organizer.status'])->group(function () {
+
+    // Dashboard
+    Route::get('/organizer/dashboard', [OrganizerDashboardController::class, 'index'])
+        ->name('organizer.dashboard');
+
     // EVENT CRUD
-    Route::resource('/organizer/events', OrganizerEventController::class);
+    Route::resource('/organizer/events', OrganizerEventController::class)->names([
+        'index' => 'organizer.events.index',
+        'create' => 'organizer.events.create',
+        'store' => 'organizer.events.store',
+        'show' => 'organizer.events.show',
+        'edit' => 'organizer.events.edit',
+        'update' => 'organizer.events.update',
+        'destroy' => 'organizer.events.destroy',
+    ]);
 
     // TICKET TYPE CRUD
-    Route::resource('/organizer/ticket-types', TicketTypeController::class);
+    Route::resource('/organizer/ticket-types', TicketTypeController::class)->names([
+        'index' => 'organizer.ticket-types.index',
+        'create' => 'organizer.ticket-types.create',
+        'store' => 'organizer.ticket-types.store',
+        'show' => 'organizer.ticket-types.show',
+        'edit' => 'organizer.ticket-types.edit',
+        'update' => 'organizer.ticket-types.update',
+        'destroy' => 'organizer.ticket-types.destroy',
+    ]);
 
     // BOOKING APPROVAL
     Route::get('/organizer/bookings', [BookingApprovalController::class, 'index'])
@@ -94,8 +135,13 @@ Route::middleware(['auth', 'role:organizer'])->group(function () {
 // =============================
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
+    // Dashboard
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
         ->name('admin.dashboard');
+
+    // Reports
+    Route::get('/admin/reports', [AdminDashboardController::class, 'reports'])
+        ->name('admin.reports');
 
     // USER APPROVAL
     Route::get('/admin/users', [AdminUserController::class, 'index'])
@@ -118,21 +164,28 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         'destroy' => 'admin.events.destroy',
     ]);
 
-    Route::get('/admin/reports', [AdminDashboardController::class, 'reports'])
-        ->name('admin.reports');
-
-    // Add this in the ADMIN ROUTES section
+    // Back to website (logout and redirect)
     Route::post('/admin/back-to-website', function () {
         auth()->logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
         return redirect()->route('home');
     })->name('admin.backToWebsite');
+
+    // TICKET TYPES CRUD (Admin)
+    Route::resource('/admin/ticket-types', AdminTicketController::class)->names([
+        'index' => 'admin.ticket-types.index',
+        'create' => 'admin.ticket-types.create',
+        'store' => 'admin.ticket-types.store',
+        'edit' => 'admin.ticket-types.edit',
+        'update' => 'admin.ticket-types.update',
+        'destroy' => 'admin.ticket-types.destroy',
+    ]);
 });
 
 
 // =============================
-// PROFILE ROUTES  (Laravel Breeze default)
+// PROFILE ROUTES (Laravel Breeze default)
 // =============================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])
@@ -146,5 +199,7 @@ Route::middleware('auth')->group(function () {
 });
 
 
+// =============================
 // AUTH ROUTES
+// =============================
 require __DIR__.'/auth.php';

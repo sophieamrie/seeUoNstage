@@ -1,39 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Organizer;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TicketType;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
-class TicketTypeController extends Controller
+class AdminTicketController extends Controller
 {
     public function index()
     {
-        // Get all events for the organizer
-        $events = Event::where('organizer_id', auth()->id())->get();
+        // Get all events
+        $events = Event::all();
         
-        // Get all ticket types for organizer's events
-        $ticketTypes = TicketType::whereIn('event_id', $events->pluck('id'))
-                                  ->with('event')
+        // Get all ticket types with their events
+        $ticketTypes = TicketType::with('event')
                                   ->latest()
                                   ->paginate(15);
 
-        return view('organizer.ticket-types.index', compact('ticketTypes', 'events'));
+        return view('admin.ticket-types.index', compact('ticketTypes', 'events'));
     }
 
     public function create()
     {
-        // Get only organizer's events
-        $events = Event::where('organizer_id', auth()->id())->get();
+        $events = Event::all();
         
         if ($events->isEmpty()) {
-            return redirect()->route('organizer.events.create')
+            return redirect()->route('admin.events.create')
                            ->with('error', 'Please create an event first before adding tickets.');
         }
 
-        return view('organizer.ticket-types.create', compact('events'));
+        return view('admin.ticket-types.create', compact('events'));
     }
 
     public function store(Request $request)
@@ -47,12 +45,6 @@ class TicketTypeController extends Controller
             'image_url' => 'nullable|image|max:2048',
         ]);
 
-        // Verify organizer owns this event
-        $event = Event::findOrFail($validated['event_id']);
-        if ($event->organizer_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
         if ($request->hasFile('image_url')) {
             $validated['image_url'] = $request->file('image_url')->store('tickets', 'public');
         }
@@ -61,29 +53,18 @@ class TicketTypeController extends Controller
 
         TicketType::create($validated);
 
-        return redirect()->route('organizer.ticket-types.index')
+        return redirect()->route('admin.ticket-types.index')
                        ->with('success', 'Ticket type created successfully!');
     }
 
     public function edit(TicketType $ticketType)
     {
-        // Verify organizer owns this ticket's event
-        if ($ticketType->event->organizer_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
-        $events = Event::where('organizer_id', auth()->id())->get();
-
-        return view('organizer.ticket-types.edit', compact('ticketType', 'events'));
+        $events = Event::all();
+        return view('admin.ticket-types.edit', compact('ticketType', 'events'));
     }
 
     public function update(Request $request, TicketType $ticketType)
     {
-        // Verify organizer owns this ticket's event
-        if ($ticketType->event->organizer_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
             'name' => 'required|string|max:255',
@@ -93,32 +74,21 @@ class TicketTypeController extends Controller
             'image_url' => 'nullable|image|max:2048',
         ]);
 
-        // Verify organizer owns the new event too
-        $event = Event::findOrFail($validated['event_id']);
-        if ($event->organizer_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
         if ($request->hasFile('image_url')) {
             $validated['image_url'] = $request->file('image_url')->store('tickets', 'public');
         }
 
         $ticketType->update($validated);
 
-        return redirect()->route('organizer.ticket-types.index')
+        return redirect()->route('admin.ticket-types.index')
                        ->with('success', 'Ticket type updated successfully!');
     }
 
     public function destroy(TicketType $ticketType)
     {
-        // Verify organizer owns this ticket's event
-        if ($ticketType->event->organizer_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
-
         $ticketType->delete();
 
-        return redirect()->route('organizer.ticket-types.index')
+        return redirect()->route('admin.ticket-types.index')
                        ->with('success', 'Ticket type deleted successfully!');
     }
 }

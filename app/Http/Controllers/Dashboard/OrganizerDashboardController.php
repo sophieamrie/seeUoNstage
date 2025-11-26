@@ -10,6 +10,6 @@ class OrganizerDashboardController extends Controller
 {
     public function index(){
         $events = Event::where('organizer_id', auth()->id())->latest()->get();
-        return view ('dashboard.organizer');
+        return view('dashboard.organizer', compact('events'));
     }
 }

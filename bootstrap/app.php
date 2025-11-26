@@ -14,8 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         //register route middleware
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'organizer.status' => \App\Http\Middleware\CheckOrganizerStatus::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Favorite;
+use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
@@ -29,6 +30,24 @@ class FavoriteController extends Controller
         Favorite::where('user_id', Auth::id())
                 ->where('event_id', $eventId)
                 ->delete();
+
+        return back();
+    }
+
+    public function toggle(Event $event)
+    {
+        $favorite = Favorite::where('user_id', Auth::id())
+                            ->where('event_id', $event->id)
+                            ->first();
+
+        if ($favorite) {
+            $favorite->delete();
+        } else {
+            Favorite::create([
+                'user_id' => Auth::id(),
+                'event_id' => $event->id,
+            ]);
+        }
 
         return back();
     }

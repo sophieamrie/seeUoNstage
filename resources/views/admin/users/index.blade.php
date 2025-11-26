@@ -34,10 +34,13 @@
                     Reports
                 </a>
                 <hr class="my-4 border-purple-600">
-                <a href="{{ route('home') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
-                    <i class="fas fa-home mr-3"></i>
-                    Back to Website
-                </a>
+                <form method="POST" action="{{ route('admin.backToWebsite') }}" class="w-full">
+                    @csrf
+                    <button type="submit" class="flex items-center px-6 py-3 hover:bg-purple-800 transition w-full text-left">
+                        <i class="fas fa-home mr-3"></i>
+                        Back to Website
+                    </button>
+                </form>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="flex items-center px-6 py-3 hover:bg-purple-800 transition w-full text-left">

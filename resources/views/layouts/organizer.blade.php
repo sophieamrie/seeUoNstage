@@ -3,60 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organizer Panel - @yield('title')</title>
+    <title>@yield('title', 'Organizer Dashboard') - seeUoNstage</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-100">
-
-    <!-- NAVBAR -->
-    <nav class="bg-white border-b shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-
-            <div class="text-xl font-bold text-indigo-600">
-                Organizer Panel
+<body class="bg-gray-50">
+    
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+        <aside class="w-64 bg-gradient-to-b from-purple-900 to-indigo-900 text-white">
+            <!-- Your sidebar content here -->
+            <div class="p-6">
+                <h2 class="text-2xl font-bold">seeUoNstage</h2>
+                <p class="text-sm text-purple-200">Organizer Panel</p>
             </div>
-
-            <div class="flex items-center gap-6">
-                <a href="{{ route('organizer.dashboard') }}" 
-                   class="text-gray-700 hover:text-indigo-600">
-                    Dashboard
+            
+            <nav class="mt-6">
+                <a href="{{ route('organizer.dashboard') }}" class="block px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-home mr-2"></i> Dashboard
                 </a>
-
-                <a href="{{ route('organizer.events.index') }}" 
-                   class="text-gray-700 hover:text-indigo-600">
-                    Events
+                <a href="{{ route('organizer.events.index') }}" class="block px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-calendar mr-2"></i> Events
                 </a>
-
-                <a href="{{ route('organizer.ticket-types.index') }}" 
-                   class="text-gray-700 hover:text-indigo-600">
-                    Ticket Types
+                <a href="{{ route('organizer.bookings.index') }}" class="block px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-ticket-alt mr-2"></i> Bookings
                 </a>
+            </nav>
+        </aside>
 
-                <a href="{{ route('organizer.bookings.index') }}" 
-                   class="text-gray-700 hover:text-indigo-600">
-                    Bookings
-                </a>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow px-8 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">@yield('title')</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </header>
 
-                <!-- USER DROPDOWN -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="text-red-600 font-medium hover:text-red-800">Logout</button>
-                </form>
+            <!-- Page Content -->
+            <div class="p-8">
+                @yield('content')
             </div>
-
-        </div>
-    </nav>
-
-    <!-- PAGE CONTENT -->
-    <main class="max-w-7xl mx-auto mt-6 px-4">
-        @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @yield('content')
-    </main>
+        </main>
+    </div>
 
 </body>
 </html>
