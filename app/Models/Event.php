@@ -19,6 +19,7 @@ class Event extends Model
 
     public function organizer() { return $this->belongsTo(User::class,'organizer_id'); }
     public function ticketTypes() { return $this->hasMany(TicketType::class); }
+    public function bookings() { return $this->hasMany(Booking::class); }
     public function ratings() { return $this->hasMany(EventRating::class); }
     public function scopePublished($query) { return $query->where('is_published', true); }
 }

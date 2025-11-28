@@ -31,6 +31,11 @@ class AdminEventController extends Controller
             'end_datetime' => 'required|date|after:start_datetime',
             'image_url' => 'nullable|image|max:2048',
             'is_published' => 'boolean',
+            'ticket_types' => 'required|array|min:1',
+            'ticket_types.*.name' => 'required|string|max:255',
+            'ticket_types.*.price' => 'required|numeric|min:0',
+            'ticket_types.*.quota' => 'required|integer|min:1',
+            'ticket_types.*.description' => 'nullable|string',
         ]);
 
         if ($request->hasFile('image_url')) {
@@ -40,9 +45,22 @@ class AdminEventController extends Controller
         $validated['organizer_id'] = auth()->id();
         $validated['is_published'] = $request->has('is_published');
 
-        Event::create($validated);
+        $event = Event::create($validated);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
+        // Create ticket types with pending status
+        foreach ($request->ticket_types as $ticketData) {
+            $event->ticketTypes()->create([
+                'name' => $ticketData['name'],
+                'price' => $ticketData['price'],
+                'quota' => $ticketData['quota'],
+                'description' => $ticketData['description'] ?? null,
+                'sold' => 0,
+                'is_available' => true,
+                'status' => 'pending', // Start as pending
+            ]);
+        }
+
+        return redirect()->route('admin.events.index')->with('success', 'Event and ticket types created successfully! Ticket types are pending approval.');
     }
 
     public function edit(Event $event)
