@@ -29,7 +29,11 @@
                     <i class="fas fa-calendar-alt mr-3"></i>
                     Manage Events
                 </a>
-                <a href="#" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                <a href="{{ route('admin.ticket-types.index') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
+                    <i class="fas fa-ticket-alt mr-3"></i>
+                    Manage Tickets
+                </a>
+                <a href="{{ route('admin.reports') }}" class="flex items-center px-6 py-3 hover:bg-purple-800 transition">
                     <i class="fas fa-chart-bar mr-3"></i>
                     Reports
                 </a>

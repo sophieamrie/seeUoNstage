@@ -50,6 +50,7 @@ class AdminTicketController extends Controller
         }
 
         $validated['remaining_quota'] = $validated['quota'];
+        $validated['status'] = 'pending'; // New tickets start as pending
 
         TicketType::create($validated);
 
@@ -90,5 +91,20 @@ class AdminTicketController extends Controller
 
         return redirect()->route('admin.ticket-types.index')
                        ->with('success', 'Ticket type deleted successfully!');
+    }
+
+    // ADD THESE NEW METHODS:
+    public function approve(TicketType $ticketType)
+    {
+        $ticketType->update(['status' => 'approved']);
+        
+        return back()->with('success', 'Ticket type approved successfully!');
+    }
+
+    public function reject(TicketType $ticketType)
+    {
+        $ticketType->update(['status' => 'rejected']);
+        
+        return back()->with('success', 'Ticket type rejected.');
     }
 }

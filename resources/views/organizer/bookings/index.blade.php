@@ -38,7 +38,7 @@
                     <i class="fas fa-clock text-yellow-600 text-xl"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->where('status', 'pending')->count() }}</h3>
+            <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->filter(function($b) { return strtolower($b->status) === 'pending'; })->count() }}</h3>
             <p class="text-sm text-gray-600">Pending Approval</p>
         </div>
 
@@ -48,7 +48,7 @@
                     <i class="fas fa-check-circle text-green-600 text-xl"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->where('status', 'approved')->count() }}</h3>
+           <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->filter(function($b) { return strtolower($b->status) === 'approved'; })->count() }}</h3>
             <p class="text-sm text-gray-600">Approved</p>
         </div>
 
@@ -58,7 +58,7 @@
                     <i class="fas fa-times-circle text-red-600 text-xl"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->where('status', 'rejected')->count() }}</h3>
+            <h3 class="text-2xl font-bold text-gray-800">{{ $bookings->filter(function($b) { return strtolower($b->status) === 'rejected'; })->count() }}</h3>
             <p class="text-sm text-gray-600">Rejected</p>
         </div>
     </div>
@@ -121,7 +121,7 @@
                             Rp {{ number_format($booking->total_price, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4">
-                            @if($booking->status === 'pending')
+                            @if(strtolower($booking->status) === 'pending')
                             <span class="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full font-medium">
                                 <i class="fas fa-clock mr-1"></i>Pending
                             </span>
@@ -140,7 +140,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4">
-                            @if($booking->status === 'pending')
+                            @if(strtolower($booking->status) === 'pending')
                             <div class="flex space-x-2">
                                 <!-- Approve Button -->
                                 <form action="{{ route('organizer.bookings.approve', $booking) }}" method="POST" class="inline">

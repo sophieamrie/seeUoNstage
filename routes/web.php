@@ -33,17 +33,38 @@ use App\Http\Controllers\ProfileController;
 // =============================
 // PUBLIC ROUTES
 // =============================
-Route::get('/', function () {
-    return view('welcome', [
-        'latestEvents' => Event::latest()->take(6)->get(),
-        'popularEvents' => Event::orderBy('views', 'desc')->take(6)->get(),
-    ]);
-})->name('home');
+    Route::get('/', function () {
+        $query = Event::query()->where('is_published', true);
+        
+        // Search functionality
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('artist', 'like', "%{$search}%")
+                ->orWhere('location', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Filter by category
+        if (request('category')) {
+            $query->where('category', request('category'));
+        }
+        
+        // Filter by location
+        if (request('location')) {
+            $query->where('location', 'like', '%' . request('location') . '%');
+        }
+        
+        return view('welcome', [
+            'latestEvents' => $query->latest()->take(6)->get(),
+            'popularEvents' => $query->orderBy('views', 'desc')->take(10)->get(),
+        ]);
+    })->name('home');
 
-Route::get('/events', [EventCatalogController::class, 'index'])->name('events.index');
-
-// Update this to use the controller
-Route::get('/events/{event}', [EventCatalogController::class, 'show'])->name('events.show');
+    Route::get('/events', [EventCatalogController::class, 'index'])->name('events.index');
+    Route::get('/events/{event}', [EventCatalogController::class, 'show'])->name('events.show');
 
 
 // =============================
@@ -60,6 +81,15 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::post('/bookings', [BookingController::class, 'store'])
         ->name('bookings.store');
+    
+    Route::get('/bookings/success/{id}', [BookingController::class, 'success'])
+        ->name('bookings.success');
+
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])
+        ->name('bookings.show');
+    
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])
+        ->name('bookings.cancel');
 
     // USER FAVORITES
     Route::get('/favorites', [FavoriteController::class, 'index'])
@@ -68,7 +98,6 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::post('/favorites/{event}/toggle', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
 });
-
 
 // =============================
 // ORGANIZER ROUTES - PENDING PAGE (No status check)
@@ -181,6 +210,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         'update' => 'admin.ticket-types.update',
         'destroy' => 'admin.ticket-types.destroy',
     ]);
+
+    Route::post('/admin/ticket-types/{ticketType}/approve', [AdminTicketController::class, 'approve'])
+        ->name('admin.ticket-types.approve');
+
+    Route::post('/admin/ticket-types/{ticketType}/reject', [AdminTicketController::class, 'reject'])
+        ->name('admin.ticket-types.reject');
 });
 
 

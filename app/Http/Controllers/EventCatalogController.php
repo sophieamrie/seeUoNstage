@@ -9,48 +9,44 @@ class EventCatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Event::published()->with('organizer');
-
-        // Search
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('artist', 'like', '%' . $request->search . '%')
-                  ->orWhere('location', 'like', '%' . $request->location . '%');
+        $query = Event::query()->where('is_published', true);
+        
+        // Search functionality
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('artist', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
-
+        
         // Filter by category
-        if ($request->filled('category')) {
+        if ($request->category) {
             $query->where('category', $request->category);
         }
-
+        
         // Filter by location
-        if ($request->filled('location')) {
+        if ($request->location) {
             $query->where('location', 'like', '%' . $request->location . '%');
         }
-
-        // Filter by date
-        if ($request->filled('date')) {
-            $query->whereDate('start_datetime', $request->date);
-        }
-
-        // Sorting
-        $sort = $request->get('sort', 'latest');
-        switch ($sort) {
-            case 'latest':
-                $query->latest('start_datetime');
-                break;
-            case 'oldest':
-                $query->oldest('start_datetime');
-                break;
-            case 'name':
-                $query->orderBy('title');
-                break;
-        }
-
-        $events = $query->paginate(12);
-        $categories = Event::published()->distinct()->pluck('category')->filter();
-        $locations = Event::published()->distinct()->pluck('location')->filter();
-
+        
+        $events = $query->latest()->paginate(12);
+        
+        // Get unique categories and locations for filters
+        $categories = Event::where('is_published', true)
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->values();
+        
+        $locations = Event::where('is_published', true)
+            ->distinct()
+            ->pluck('location')
+            ->filter()
+            ->values();
+        
         return view('events.index', compact('events', 'categories', 'locations'));
     }
 
@@ -58,13 +54,10 @@ class EventCatalogController extends Controller
     {
         // Load ticket types with the event
         $event->load('ticketTypes');
-
-        // Check if user has favorited this event
-        $isFavorited = false;
-        if (auth()->check()) {
-            $isFavorited = auth()->user()->favorites()->where('event_id', $event->id)->exists();
-        }
-
-        return view('events.show', compact('event', 'isFavorited'));
+        
+        // Increment view count (optional)
+        $event->increment('views');
+        
+        return view('events.show', compact('event'));
     }
 }

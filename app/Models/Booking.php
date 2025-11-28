@@ -22,7 +22,7 @@ class Booking extends Model
         parent::boot();
 
         static::creating(function ($booking) {
-            if (!booking->booking_code){
+            if (!$booking->booking_code){
                 $booking->booking_code = 'BK-' .strtoupper(uniqid());
             }
             $booking->booked_at = now();

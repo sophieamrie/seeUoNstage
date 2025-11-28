@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $event->title }} - seeUoNstage</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-50">
@@ -57,27 +57,28 @@
         </a>
 
         <!-- Favorite Button -->
+        @auth
         <div class="absolute top-6 right-6">
-            @auth
+            @if(auth()->user()->role === 'user')
+                @php
+                    $isFavorited = auth()->user()->favorites()->where('event_id', $event->id)->exists();
+                @endphp
                 <form action="{{ route('favorites.toggle', $event) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="bg-white text-red-600 p-3 rounded-full hover:bg-gray-100 transition shadow-lg">
-                        <i class="fas fa-heart{{ $isFavorited ? '' : ' far' }}"></i>
+                        <i class="fas fa-heart{{ $isFavorited ? '' : '-o' }}"></i>
                     </button>
                 </form>
-            @else
-                <a href="{{ route('login') }}" class="bg-white text-red-600 p-3 rounded-full hover:bg-gray-100 transition shadow-lg inline-block">
-                    <i class="far fa-heart"></i>
-                </a>
-            @endauth
+            @endif
         </div>
+        @endauth
     </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column - Event Info -->
-            <div class="col-span-2">
+            <div class="lg:col-span-2">
                 <!-- Event Header -->
                 <div class="mb-8">
                     @if($event->category)
@@ -105,7 +106,10 @@
                                 {{ $event->start_datetime->format('l, F d, Y') }}
                             </p>
                             <p class="text-gray-600">
-                                {{ $event->start_datetime->format('h:i A') }} - {{ $event->end_datetime->format('h:i A') }}
+                                {{ $event->start_datetime->format('h:i A') }}
+                                @if($event->end_datetime)
+                                    - {{ $event->end_datetime->format('h:i A') }}
+                                @endif
                             </p>
                         </div>
                     </div>
@@ -132,12 +136,12 @@
                 <!-- Description -->
                 <div class="bg-white rounded-lg shadow p-6 mb-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
-                    <p class="text-gray-700 leading-relaxed">{{ $event->description }}</p>
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ $event->description }}</p>
                 </div>
             </div>
 
             <!-- Right Column - Ticket Booking -->
-            <div class="col-span-1">
+            <div class="lg:col-span-1">
                 <!-- Ticket Section -->
                 <div class="bg-white rounded-lg shadow p-6 sticky top-24">
                     <h2 class="text-2xl font-bold text-gray-900 mb-6">Get Tickets</h2>
@@ -145,7 +149,13 @@
                     @if($event->ticketTypes->count() > 0)
                         <div class="space-y-4 mb-6">
                             @foreach($event->ticketTypes as $ticketType)
-                                <div class="border rounded-lg p-4 hover:border-purple-600 transition cursor-pointer ticket-option" data-ticket-id="{{ $ticketType->id }}">
+                                @php
+                                    $availableTickets = $ticketType->quota - $ticketType->sold;
+                                    $isSoldOut = $availableTickets <= 0;
+                                @endphp
+                                <div class="border rounded-lg p-4 hover:border-purple-600 transition {{ $isSoldOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }} ticket-option" 
+                                     data-ticket-id="{{ $ticketType->id }}"
+                                     data-sold-out="{{ $isSoldOut ? 'true' : 'false' }}">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-semibold text-gray-900">{{ $ticketType->name }}</h3>
                                         <span class="text-lg font-bold text-purple-600">
@@ -158,14 +168,15 @@
                                     @endif
 
                                     <div class="flex justify-between items-center text-sm">
-                                        <span class="text-gray-600">
-                                            <i class="fas fa-ticket-alt mr-1"></i>
-                                            @if($ticketType->quota > 0)
-                                                {{ $ticketType->quota }} available
-                                            @else
-                                                <span class="text-red-600 font-semibold">Sold Out</span>
-                                            @endif
-                                        </span>
+                                        @if($isSoldOut)
+                                            <span class="text-red-600 font-semibold">
+                                                <i class="fas fa-times-circle mr-1"></i>Sold Out
+                                            </span>
+                                        @else
+                                            <span class="text-green-600">
+                                                <i class="fas fa-check-circle mr-1"></i>{{ $availableTickets }} available
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
@@ -174,12 +185,13 @@
                         <!-- Book Button -->
                         @auth
                             @if(auth()->user()->role === 'user')
-                                <form action="{{ route('bookings.store') }}" method="POST">
+                                <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                                     @csrf
                                     <input type="hidden" name="event_id" value="{{ $event->id }}">
                                     <input type="hidden" name="ticket_type_id" id="selected_ticket_type" value="">
+                                    <input type="hidden" name="quantity" value="1">
                                     
-                                    <button type="submit" class="w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition" id="bookButton" disabled>
+                                    <button type="submit" class="w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed" id="bookButton" disabled>
                                         <i class="fas fa-shopping-cart mr-2"></i>Book Tickets
                                     </button>
                                 </form>
@@ -225,13 +237,22 @@
 
         ticketOptions.forEach(option => {
             option.addEventListener('click', function() {
-                ticketOptions.forEach(opt => opt.classList.remove('border-purple-600', 'bg-purple-50'));
+                // Check if sold out
+                if (this.dataset.soldOut === 'true') {
+                    return;
+                }
+
+                // Remove selection from all options
+                ticketOptions.forEach(opt => {
+                    opt.classList.remove('border-purple-600', 'bg-purple-50');
+                });
+
+                // Add selection to clicked option
                 this.classList.add('border-purple-600', 'bg-purple-50');
                 selectedTicketInput.value = this.dataset.ticketId;
                 
-                // Enable book button if a ticket is selected and has quota
-                const quota = this.querySelector('.text-sm').textContent;
-                if (!quota.includes('Sold Out') && bookButton) {
+                // Enable book button
+                if (bookButton) {
                     bookButton.disabled = false;
                 }
             });
