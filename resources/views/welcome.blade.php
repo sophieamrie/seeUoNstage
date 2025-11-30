@@ -1,3 +1,4 @@
+{{-- resources/views/welcome.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,160 +7,380 @@
     <title>seeUoNstage - Book Concert Tickets</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; }
+        
+        .noise-bg {
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.03) 2px, rgba(255,255,255,.03) 4px),
+                linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .spotlight {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spotlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: spotlight 8s ease-in-out infinite;
+        }
+        
+        @keyframes spotlight {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(20%, 20%); }
+            50% { transform: translate(-10%, 30%); }
+            75% { transform: translate(30%, -10%); }
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .bento-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        
+        .category-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .category-hover:hover {
+            transform: translateY(-8px) rotate(-2deg);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 m-0 p-0">
+<body class="bg-gray-900 m-0 p-0">
     
-    <!-- Top Navigation Bar -->
-    <nav class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <!-- Left: Brand & Nav -->
-        <div class="flex items-center space-x-6">
-            <a href="{{ route('home') }}" class="text-2xl font-bold text-purple-600">seeUoNstage</a>
-            <a href="{{ route('events.index') }}" class="text-gray-600 hover:text-purple-600 font-semibold transition">Browse Events</a>
-        </div>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="{{ route('home') }}" class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    seeUoNstage
+                </a>
+                <a href="{{ route('events.index') }}" class="text-gray-300 hover:text-white transition font-medium hidden md:block">
+                    Events
+                </a>
+            </div>
 
-        <!-- Right: Login & Register -->
-        <div class="flex space-x-4">
-            @auth
-                @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.dashboard') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-                        Admin Dashboard
-                    </a>
-                @elseif(auth()->user()->role === 'organizer')
-                    <a href="{{ route('organizer.dashboard') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-                        Organizer Dashboard
-                    </a>
+            <div class="flex gap-3 items-center">
+                @auth
+                    <span class="text-gray-400 text-sm">{{ auth()->user()->name }}</span>
+                    @if(auth()->user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="text-gray-300 hover:text-white transition">
+                            Dashboard
+                        </a>
+                    @elseif(auth()->user()->role === 'organizer')
+                        <a href="{{ route('organizer.dashboard') }}" class="text-gray-300 hover:text-white transition">
+                            Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('dashboard') }}" class="text-gray-300 hover:text-white transition">
+                            Dashboard
+                        </a>
+                    @endif
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+                            Logout
+                        </button>
+                    </form>
                 @else
-                    <a href="{{ route('dashboard') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-                        My Dashboard
+                    <a href="{{ route('login') }}" class="text-gray-300 hover:text-white px-5 py-2 font-medium transition">
+                        Login
                     </a>
-                @endif
-            @else
-                <a href="{{ route('login') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-semibold transition">
-                    Login
-                </a>
-                <a href="{{ route('register') }}" class="bg-white hover:bg-gray-50 text-purple-600 border-2 border-purple-600 px-6 py-2 rounded-lg font-semibold transition">
-                    Register
-                </a>
-            @endauth
+                    <a href="{{ route('register') }}" class="bg-white text-gray-900 px-5 py-2 rounded-full font-semibold hover:bg-gray-100 transition">
+                        Sign up
+                    </a>
+                @endauth
+            </div>
         </div>
     </nav>
 
-    <!-- Hero Section with CTA -->
-    <section class="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12 px-8">
-        <div class="max-w-6xl mx-auto text-center">
-            <h1 class="text-5xl font-bold mb-4">Discover Amazing Events</h1>
-            <p class="text-xl mb-8 text-purple-100">Find and book tickets to concerts, festivals, and shows near you</p>
-            <a href="{{ route('events.index') }}" class="inline-block bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-purple-50 transition transform hover:scale-105 shadow-lg">
-                <i class="fas fa-compass mr-2"></i>Browse All Events
-            </a>
+    <!-- Hero -->
+    <section class="noise-bg spotlight min-h-screen flex items-center justify-center pt-20 px-6 relative overflow-hidden">
+        <!-- Floating elements -->
+        <div class="absolute top-40 left-10 w-20 h-20 bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-40 right-20 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-block mb-6 px-6 py-2 glass rounded-full text-purple-200 text-sm font-medium">
+                ✨ Live concerts & festivals near you
+            </div>
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
+                Your stage<br/>awaits
+            </h1>
+            <p class="text-xl md:text-2xl text-purple-200 mb-12 max-w-2xl mx-auto">
+                Discover unforgettable live experiences. From indie shows to major festivals.
+            </p>
+
+            <!-- Search Bar -->
+            <div class="max-w-3xl mx-auto mb-16">
+                <form action="{{ route('events.index') }}" method="GET" class="glass rounded-2xl p-2">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" 
+                               name="search" 
+                               placeholder="Search artists, events..." 
+                               class="flex-1 bg-white/10 text-white placeholder-purple-200 px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                        
+                        <select name="category" class="bg-white/10 text-white px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                            <option value="">All Types</option>
+                            <option value="Concert">Concert</option>
+                            <option value="Festival">Festival</option>
+                            <option value="Theater">Theater</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        
+                        <input type="text" 
+                               name="location" 
+                               placeholder="Location..." 
+                               class="bg-white/10 text-white placeholder-purple-200 px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                        
+                        <button type="submit" class="bg-white text-gray-900 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition whitespace-nowrap">
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Categories -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="{{ route('events.index', ['category' => 'Concert']) }}" class="glass px-6 py-3 rounded-full text-white hover:bg-white/10 transition">
+                    🎸 Concerts
+                </a>
+                <a href="{{ route('events.index', ['category' => 'Festival']) }}" class="glass px-6 py-3 rounded-full text-white hover:bg-white/10 transition">
+                    🎪 Festivals
+                </a>
+                <a href="{{ route('events.index', ['category' => 'Theater']) }}" class="glass px-6 py-3 rounded-full text-white hover:bg-white/10 transition">
+                    🎭 Theater
+                </a>
+                <a href="{{ route('events.index', ['category' => 'Comedy']) }}" class="glass px-6 py-3 rounded-full text-white hover:bg-white/10 transition">
+                    😂 Comedy
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Main Content Area - Sliding Carousel -->
-    <section class="p-8 relative" id="events">
-        <!-- Section Header -->
-        <div class="max-w-6xl mx-auto mb-6 flex items-center justify-between">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Latest Events</h2>
-                <p class="text-gray-600">Check out the newest additions to our lineup</p>
+    <!-- Latest Events -->
+    <section class="bg-gray-50 py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <span class="text-purple-600 font-semibold text-sm uppercase tracking-wider">What's New</span>
+                    <h2 class="text-5xl font-bold text-gray-900 mt-2">Latest Events</h2>
+                </div>
+                <a href="{{ route('events.index') }}" class="text-purple-600 hover:text-purple-700 font-semibold group">
+                    See all 
+                    <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </a>
             </div>
-            <a href="{{ route('events.index') }}" class="text-purple-600 hover:text-purple-800 font-semibold flex items-center">
-                View All <i class="fas fa-arrow-right ml-2"></i>
-            </a>
+
+            <div class="relative overflow-hidden">
+                <div id="carousel" class="flex transition-transform duration-500 ease-out">
+                    @php
+                        $latestChunks = $latestEvents->chunk(2);
+                        $totalSlides = $latestChunks->count();
+                    @endphp
+
+                    @forelse($latestChunks as $chunk)
+                        <div class="min-w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                            @foreach($chunk as $event)
+                                <a href="{{ route('events.show', $event) }}" class="group relative overflow-hidden rounded-3xl bg-gray-900 aspect-[4/3]">
+                                    @if($event->image_url)
+                                        <img src="{{ asset('storage/' . $event->image_url) }}" 
+                                             alt="{{ $event->title }}" 
+                                             class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+                                    @else
+                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600"></div>
+                                    @endif
+                                    
+                                    <div class="absolute bottom-0 left-0 right-0 p-8">
+                                        <div class="flex gap-3 mb-4">
+                                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                                                {{ $event->start_datetime->format('M d') }}
+                                            </span>
+                                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                                                {{ Str::limit($event->location, 20) }}
+                                            </span>
+                                        </div>
+                                        <h3 class="text-3xl font-bold text-white mb-2 group-hover:text-purple-300 transition">
+                                            {{ $event->title }}
+                                        </h3>
+                                        @if($event->artist)
+                                            <p class="text-purple-200 text-lg">{{ $event->artist }}</p>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @empty
+                        <div class="min-w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 aspect-[4/3] flex items-center justify-center p-8">
+                                <div class="text-center text-white">
+                                    <div class="text-6xl mb-4">🎵</div>
+                                    <h3 class="text-2xl font-bold mb-2">Coming Soon</h3>
+                                    <p class="text-purple-100">Exciting events are on the way</p>
+                                </div>
+                            </div>
+                            <div class="rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-600 aspect-[4/3] flex items-center justify-center p-8">
+                                <div class="text-center text-white">
+                                    <div class="text-6xl mb-4">🎤</div>
+                                    <h3 class="text-2xl font-bold mb-2">Stay Tuned</h3>
+                                    <p class="text-blue-100">Check back soon for updates</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+
+                @if($totalSlides > 1)
+                    <button id="prevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-100 text-gray-900 p-4 rounded-full shadow-xl transition z-10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    
+                    <button id="nextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white hover:bg-gray-100 text-gray-900 p-4 rounded-full shadow-xl transition z-10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="flex justify-center mt-8 gap-2">
+                        @for($i = 0; $i < $totalSlides; $i++)
+                            <button class="slide-indicator h-2 rounded-full transition-all {{ $i === 0 ? 'w-8 bg-purple-600' : 'w-2 bg-gray-300' }}" data-slide="{{ $i }}"></button>
+                        @endfor
+                    </div>
+                @endif
+            </div>
         </div>
+    </section>
 
-        <div class="relative overflow-hidden max-w-6xl mx-auto">
-            <!-- Carousel Container -->
-            <div id="carousel" class="flex transition-transform duration-500 ease-in-out">
-                
-                @php
-                    // Group latest events into pairs for slides
-                    $latestChunks = $latestEvents->chunk(2);
-                    $totalSlides = $latestChunks->count();
-                @endphp
+    <!-- This Week's Lineup -->
+    <section class="bg-gray-900 py-24 px-6 relative overflow-hidden">
+        <!-- Decorative background -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <span class="text-purple-400 font-semibold text-sm uppercase tracking-wider">Next 7 Days</span>
+                    <h2 class="text-5xl font-bold text-white mt-2">This Week's Lineup</h2>
+                    <p class="text-gray-400 mt-3">Don't miss these upcoming shows</p>
+                </div>
+                <a href="{{ route('events.index') }}" class="text-purple-400 hover:text-purple-300 font-semibold group hidden md:flex items-center gap-2">
+                    View calendar 
+                    <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
+                </a>
+            </div>
 
-                @forelse($latestChunks as $chunk)
-                <!-- Slide -->
-                <div class="min-w-full grid grid-cols-2 gap-8 h-96">
-                    @foreach($chunk as $event)
-                    <a href="{{ route('events.show', $event) }}" class="bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl shadow-xl overflow-hidden group hover:scale-105 transition-transform duration-300">
-                        @if($event->image_url)
-                        <div class="h-full w-full relative">
-                            <img src="{{ asset('storage/' . $event->image_url) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
-                                <h2 class="text-3xl font-bold mb-2">{{ $event->title }}</h2>
-                                @if($event->artist)
-                                <p class="text-xl mb-2 text-purple-200">{{ $event->artist }}</p>
-                                @endif
-                                <div class="flex items-center text-sm space-x-4">
-                                    <span><i class="fas fa-calendar mr-1"></i>{{ $event->start_datetime->format('M d, Y') }}</span>
-                                    <span><i class="fas fa-map-marker-alt mr-1"></i>{{ Str::limit($event->location, 20) }}</span>
-                                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse($thisWeekEvents as $event)
+                    <a href="{{ route('events.show', $event) }}" class="group relative bg-gray-800/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/5 hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-2">
+                        <div class="aspect-[16/10] overflow-hidden">
+                            @if($event->image_url)
+                                <img src="{{ asset('storage/' . $event->image_url) }}" 
+                                     alt="{{ $event->title }}" 
+                                     class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                            @else
+                                <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500"></div>
+                            @endif
+                        </div>
+                        
+                        <div class="p-6">
+                            <!-- Date Badge -->
+                            <div class="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-purple-500/20 rounded-full">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span class="text-purple-300 text-sm font-semibold">
+                                    {{ $event->start_datetime->format('D, M j') }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition">
+                                {{ Str::limit($event->title, 35) }}
+                            </h3>
+                            
+                            @if($event->artist)
+                                <p class="text-gray-400 mb-3">{{ Str::limit($event->artist, 30) }}</p>
+                            @endif
+                            
+                            <div class="flex items-center text-gray-500 text-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ Str::limit($event->location, 25) }}
                             </div>
                         </div>
-                        @else
-                        <div class="h-full flex items-center justify-center p-8">
-                            <div class="text-center text-white">
-                                <h2 class="text-4xl font-bold mb-4">{{ $event->title }}</h2>
-                                @if($event->artist)
-                                <p class="text-2xl mb-4 text-purple-100">{{ $event->artist }}</p>
-                                @endif
-                                <div class="flex flex-col items-center space-y-2 text-lg">
-                                    <span><i class="fas fa-calendar mr-2"></i>{{ $event->start_datetime->format('M d, Y') }}</span>
-                                    <span><i class="fas fa-map-marker-alt mr-2"></i>{{ $event->location }}</span>
-                                </div>
-                            </div>
+                        
+                        <!-- Hover indicator -->
+                        <div class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
                         </div>
-                        @endif
                     </a>
-                    @endforeach
-                </div>
                 @empty
-                <!-- Empty State Slide -->
-                <div class="min-w-full grid grid-cols-2 gap-8 h-96">
-                    <div class="bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl shadow-xl flex items-center justify-center">
-                        <div class="text-center text-white p-8">
-                            <i class="fas fa-calendar-alt text-6xl mb-4 opacity-50"></i>
-                            <h2 class="text-3xl font-bold mb-2">No Events Yet</h2>
-                            <p class="text-xl">Check back soon for upcoming concerts!</p>
+                    <div class="col-span-3 text-center py-16">
+                        <div class="w-20 h-20 mx-auto mb-6 bg-gray-800 rounded-full flex items-center justify-center">
+                            <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
                         </div>
+                        <h3 class="text-xl font-bold text-white mb-2">No events this week</h3>
+                        <p class="text-gray-500">Check back soon for upcoming shows</p>
                     </div>
-                    <div class="bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl shadow-xl flex items-center justify-center">
-                        <div class="text-center text-white p-8">
-                            <i class="fas fa-music text-6xl mb-4 opacity-50"></i>
-                            <h2 class="text-3xl font-bold mb-2">Coming Soon</h2>
-                            <p class="text-xl">Exciting events are on the way!</p>
-                        </div>
-                    </div>
-                </div>
                 @endforelse
-
             </div>
-
-            @if($totalSlides > 1)
-            <!-- Navigation Arrows -->
-            <button id="prevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-purple-600 p-4 rounded-full shadow-lg transition z-10">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-            </button>
             
-            <button id="nextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-purple-600 p-4 rounded-full shadow-lg transition z-10">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-
-            <!-- Slide Indicators -->
-            <div class="flex justify-center mt-6 space-x-2">
-                @for($i = 0; $i < $totalSlides; $i++)
-                <button class="slide-indicator w-3 h-3 rounded-full {{ $i === 0 ? 'bg-purple-600' : 'bg-gray-300' }}" data-slide="{{ $i }}"></button>
-                @endfor
-            </div>
+            @if($thisWeekEvents->count() > 0)
+                <div class="text-center mt-12">
+                    <a href="{{ route('events.index') }}" class="inline-block text-purple-400 hover:text-purple-300 font-semibold">
+                        See full calendar →
+                    </a>
+                </div>
             @endif
         </div>
     </section>
+
+    <!-- CTA -->
+    <section class="bg-gray-50 py-24 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                Don't miss out
+            </h2>
+            <p class="text-xl text-gray-600 mb-10">
+                Thousands of live events happening every month. Find yours today.
+            </p>
+            <a href="{{ route('events.index') }}" class="inline-block bg-gray-900 text-white px-10 py-5 rounded-full font-semibold text-lg hover:bg-gray-800 transition transform hover:scale-105">
+                Explore all events
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-white/10 py-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-gray-500">&copy; 2024 seeUoNstage. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
         const totalSlides = {{ $totalSlides }};
@@ -174,11 +395,11 @@
                 
                 indicators.forEach((indicator, index) => {
                     if (index === currentSlide) {
-                        indicator.classList.remove('bg-gray-300');
-                        indicator.classList.add('bg-purple-600');
+                        indicator.classList.remove('w-2', 'bg-gray-300');
+                        indicator.classList.add('w-8', 'bg-purple-600');
                     } else {
-                        indicator.classList.remove('bg-purple-600');
-                        indicator.classList.add('bg-gray-300');
+                        indicator.classList.remove('w-8', 'bg-purple-600');
+                        indicator.classList.add('w-2', 'bg-gray-300');
                     }
                 });
             }
@@ -224,67 +445,6 @@
             }
         }
     </script>
-
-    <!-- Popular Events Section -->
-    <section class="bg-gradient-to-b from-purple-900 to-indigo-900 text-white px-12 py-12">
-        
-        <!-- Section Header -->
-        <div class="max-w-6xl mx-auto mb-8">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-3xl font-bold mb-2">Popular Events</h2>
-                    <p class="text-purple-200">Trending events you don't want to miss</p>
-                </div>
-                <a href="{{ route('events.index') }}" class="text-white hover:text-purple-200 font-semibold flex items-center">
-                    View All <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            </div>
-
-            <!-- Popular Events Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                @forelse($popularEvents as $event)
-                <a href="{{ route('events.show', $event) }}" class="group">
-                    @if($event->image_url)
-                    <div class="w-24 h-24 rounded-full overflow-hidden mb-3 mx-auto border-4 border-white/20 group-hover:border-white/50 transition group-hover:scale-110 duration-300 shadow-lg">
-                        <img src="{{ asset('storage/' . $event->image_url) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
-                    </div>
-                    @else
-                    <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-3xl font-bold mb-3 mx-auto border-4 border-white/20 group-hover:border-white/50 group-hover:scale-110 transition duration-300 shadow-lg">
-                        {{ substr($event->title, 0, 1) }}
-                    </div>
-                    @endif
-                    <p class="text-center text-sm font-semibold group-hover:text-purple-200 transition">{{ Str::limit($event->title, 20) }}</p>
-                    @if($event->artist)
-                    <p class="text-center text-xs text-purple-300">{{ Str::limit($event->artist, 15) }}</p>
-                    @endif
-                </a>
-                @empty
-                <div class="col-span-6 text-center py-8">
-                    <i class="fas fa-music text-4xl opacity-50 mb-4"></i>
-                    <p class="text-purple-200">No popular events yet</p>
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="bg-white py-16 px-8">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl font-bold text-gray-800 mb-4">Ready to Find Your Next Event?</h2>
-            <p class="text-xl text-gray-600 mb-8">Browse our full catalog of concerts, festivals, and shows</p>
-            <a href="{{ route('events.index') }}" class="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
-                <i class="fas fa-ticket-alt mr-2"></i>Explore All Events
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 px-12">
-        <div class="max-w-6xl mx-auto text-center">
-            <p class="text-gray-400">&copy; 2024 seeUoNstage. All rights reserved.</p>
-        </div>
-    </footer>
 
 </body>
 </html>

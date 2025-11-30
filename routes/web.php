@@ -34,6 +34,9 @@ use App\Http\Controllers\ProfileController;
 // PUBLIC ROUTES
 // =============================
     Route::get('/', function () {
+        $today = \Carbon\Carbon::today();
+        $nextWeek = \Carbon\Carbon::today()->addWeek();
+        
         $query = Event::query()->where('is_published', true);
         
         // Search functionality
@@ -58,8 +61,12 @@ use App\Http\Controllers\ProfileController;
         }
         
         return view('welcome', [
-            'latestEvents' => $query->latest()->take(6)->get(),
-            'popularEvents' => $query->orderBy('views', 'desc')->take(10)->get(),
+            'latestEvents' => $query->latest()->take(10)->get(),
+            'thisWeekEvents' => Event::where('is_published', true)
+                                    ->whereBetween('start_datetime', [$today, $nextWeek])
+                                    ->orderBy('start_datetime', 'asc')
+                                    ->take(6)
+                                    ->get(),
         ]);
     })->name('home');
 
@@ -216,6 +223,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::post('/admin/ticket-types/{ticketType}/reject', [AdminTicketController::class, 'reject'])
         ->name('admin.ticket-types.reject');
+    
+    Route::post('/admin/bookings/{booking}/approve', [AdminTicketController::class, 'approveBooking'])
+        ->name('admin.bookings.approve');
+
+    Route::post('/admin/bookings/{booking}/reject', [AdminTicketController::class, 'rejectBooking'])
+        ->name('admin.bookings.reject');
+
+    Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])
+        ->name('admin.users.destroy');
 });
 
 

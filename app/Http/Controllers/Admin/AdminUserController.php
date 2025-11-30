@@ -31,4 +31,21 @@ class AdminUserController extends Controller
         
         return redirect()->back()->with('success', 'User rejected.');
     }
-}
+
+    public function destroy(User $user)
+    {
+        // Prevent deleting admins or organizers
+        if ($user->role === 'admin' || $user->role === 'organizer') {
+            return back()->with('error', 'Cannot delete admin or organizer accounts.');
+        }
+        
+        // Prevent deleting yourself
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+        
+        $user->delete();
+        
+        return back()->with('success', 'User deleted successfully.');
+    }
+    }

@@ -6,68 +6,73 @@
     <title>@yield('title') - seeUoNstage</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        body { font-family: 'Space Grotesk', sans-serif; }
+    </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-900">
 
     <div class="flex h-screen">
         {{-- Sidebar --}}
-        <aside class="w-64 bg-gradient-to-b from-purple-900 to-indigo-900 text-white flex flex-col">
+        <aside class="w-64 bg-gray-900 border-r border-white/10 flex flex-col">
             
             {{-- Logo --}}
-            <div class="p-6 border-b border-purple-700">
-                <h2 class="text-2xl font-bold flex items-center">
-                    <i class="fas fa-music mr-2"></i>
+            <div class="p-6 border-b border-white/10">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                     seeUoNstage
                 </h2>
-                <p class="text-xs text-purple-200 mt-1">User Dashboard</p>
+                <p class="text-xs text-gray-500 mt-1">User Dashboard</p>
             </div>
 
             {{-- Navigation --}}
-            <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 rounded-lg transition {{ request()->is('dashboard') ? 'bg-purple-700 text-white' : 'text-purple-100 hover:bg-purple-800' }}">
+            <nav class="flex-1 px-4 py-6 space-y-1">
+                <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition {{ request()->is('dashboard') ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
                     <i class="fas fa-home w-5"></i>
                     <span class="ml-3 font-medium">Dashboard</span>
                 </a>
 
-                <a href="{{ route('bookings.index') }}" class="flex items-center px-4 py-3 rounded-lg transition {{ request()->is('bookings*') ? 'bg-purple-700 text-white' : 'text-purple-100 hover:bg-purple-800' }}">
+                <a href="{{ route('bookings.index') }}" class="flex items-center px-4 py-3 rounded-xl transition {{ request()->is('bookings*') ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
                     <i class="fas fa-ticket-alt w-5"></i>
                     <span class="ml-3 font-medium">My Bookings</span>
                 </a>
 
-                <a href="{{ route('favorites.index') }}" class="flex items-center px-4 py-3 rounded-lg transition {{ request()->is('favorites*') ? 'bg-purple-700 text-white' : 'text-purple-100 hover:bg-purple-800' }}">
+                <a href="{{ route('favorites.index') }}" class="flex items-center px-4 py-3 rounded-xl transition {{ request()->is('favorites*') ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
                     <i class="fas fa-heart w-5"></i>
                     <span class="ml-3 font-medium">Favorites</span>
                 </a>
 
-                <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 rounded-lg transition {{ request()->is('profile*') ? 'bg-purple-700 text-white' : 'text-purple-100 hover:bg-purple-800' }}">
+                <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-3 rounded-xl transition {{ request()->is('profile*') ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30' : 'text-gray-400 hover:text-white hover:bg-white/5' }}">
                     <i class="fas fa-user w-5"></i>
                     <span class="ml-3 font-medium">Profile</span>
                 </a>
 
-                <hr class="border-purple-700 my-4">
+                <div class="h-px bg-white/10 my-4"></div>
 
-                <a href="{{ route('home') }}" class="flex items-center px-4 py-3 rounded-lg transition text-purple-100 hover:bg-purple-800">
-                    <i class="fas fa-globe w-5"></i>
+                <a href="{{ route('home') }}" class="flex items-center px-4 py-3 rounded-xl transition text-gray-400 hover:text-white hover:bg-white/5">
+                    <i class="fas fa-arrow-left w-5"></i>
                     <span class="ml-3 font-medium">Back to Website</span>
                 </a>
             </nav>
 
             {{-- User Info & Logout --}}
-            <div class="p-4 border-t border-purple-700">
-                <div class="flex items-center mb-3 px-2">
-                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-white"></i>
-                    </div>
-                    <div class="ml-3 flex-1 overflow-hidden">
-                        <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-purple-300 truncate">{{ auth()->user()->email }}</p>
+            <div class="p-4 border-t border-white/10">
+                <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-3 border border-white/10">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg">
+                            <span class="text-white font-bold text-lg">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        </div>
+                        <div class="ml-3 flex-1 overflow-hidden">
+                            <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                        </div>
                     </div>
                 </div>
                 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-semibold transition flex items-center justify-center">
+                    <button type="submit" class="w-full bg-white/10 hover:bg-white/20 text-white py-2.5 px-4 rounded-xl font-medium transition flex items-center justify-center border border-white/10">
                         <i class="fas fa-sign-out-alt mr-2"></i>
                         Logout
                     </button>
@@ -76,27 +81,27 @@
         </aside>
 
         {{-- Main Content --}}
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto bg-gray-900">
             {{-- Top Bar --}}
-            <header class="bg-white shadow-sm px-8 py-4 border-b">
-                <h1 class="text-2xl font-bold text-gray-800">@yield('title')</h1>
+            <header class="bg-gray-800/50 backdrop-blur-sm border-b border-white/10 px-8 py-4 sticky top-0 z-10">
+                <h1 class="text-2xl font-bold text-white">@yield('title')</h1>
             </header>
 
             {{-- Page Content --}}
             <div class="p-8">
                 {{-- Success Messages --}}
                 @if(session('success'))
-                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
+                <div class="bg-green-500/20 backdrop-blur-sm border border-green-500/30 text-green-300 px-4 py-3 rounded-xl mb-6 flex items-center">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    <span>{{ session('success') }}</span>
                 </div>
                 @endif
 
                 {{-- Error Messages --}}
                 @if(session('error'))
-                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    {{ session('error') }}
+                <div class="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-6 flex items-center">
+                    <i class="fas fa-exclamation-circle mr-3"></i>
+                    <span>{{ session('error') }}</span>
                 </div>
                 @endif
 
