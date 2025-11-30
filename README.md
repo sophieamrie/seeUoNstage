@@ -1,4 +1,4 @@
-# E-Ticketing Event System
+# seeUoNstage E-Ticketing Event System
 
 A Laravel-based event management and ticket booking platform built for academic purposes. The system supports multiple user roles (Admin, Organizer, Registered User, Guest) and provides end-to-end event and ticket management.
 
