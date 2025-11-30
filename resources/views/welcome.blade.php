@@ -135,14 +135,16 @@
                                placeholder="Search artists, events..." 
                                class="flex-1 bg-white/10 text-white placeholder-purple-200 px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
                         
-                        <select name="category" class="bg-white/10 text-white px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                        <select name="category"
+                            class="bg-white/10 text-white px-6 py-4 rounded-xl border-0 focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition appearance-none"
+                        >
                             <option value="">All Types</option>
-                            <option value="Concert">Concert</option>
-                            <option value="Festival">Festival</option>
-                            <option value="Theater">Theater</option>
-                            <option value="Comedy">Comedy</option>
-                            <option value="Other">Other</option>
+                            <option value="Concert" class="text-black">Concert</option>
+                            <option value="Festival" class="text-black">Festival</option>
+                            <option value="Theater" class="text-black">Theater</option>
+                            <option value="Comedy" class="text-black">Comedy</option>
                         </select>
+
                         
                         <input type="text" 
                                name="location" 

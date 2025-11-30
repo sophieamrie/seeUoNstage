@@ -46,11 +46,18 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-semibold text-white mb-2">Category</label>
-                    <input type="text" name="category" 
-                           class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition"
-                           value="{{ old('category', $event->category) }}"
-                           placeholder="e.g., Concert, Festival">
+                    <label for="category" class="block text-sm font-semibold text-gray-300 mb-2">Category</label>
+                    <select id="category" name="category" 
+                        class="w-full px-4 py-3 bg-gray-900/50 border border-white/10 rounded-xl text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition @error('category') border-red-500 @enderror">
+                        <option value="">Select category...</option>
+                        <option value="Concert" {{ old('category') == 'Concert' ? 'selected' : '' }}>Concert</option>
+                        <option value="Festival" {{ old('category') == 'Festival' ? 'selected' : '' }}>Festival</option>
+                        <option value="Comedy" {{ old('category') == 'Comedy' ? 'selected' : '' }}>Comedy</option>
+                        <option value="Theater" {{ old('category') == 'Theater' ? 'selected' : '' }}>Theater</option>
+                    </select>
+                    @error('category')
+                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-white mb-2">Artist</label>
