@@ -33,5 +33,5 @@ class AdminTicketController extends Controller
         return back()->with('success', 'Booking rejected.');
     }
     
-    // ... rest of your existing methods (create, store, edit, update, destroy, approve, reject for ticket types)
+
 }

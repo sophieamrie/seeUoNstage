@@ -117,12 +117,6 @@
 
                     {{-- Actions --}}
                     <div class="flex flex-col space-y-2">
-                        @if(strtolower($booking->status) === 'approved')
-                        <a href="{{ route('bookings.show', $booking) }}" class="bg-white text-gray-900 px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-100 transition text-center">
-                            <i class="fas fa-ticket-alt mr-2"></i>View Ticket
-                        </a>
-                        @endif
-
                         @if(strtolower($booking->status) === 'pending' && now()->lessThan($booking->cancellable_until))
                         <form action="{{ route('bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?')">
                             @csrf

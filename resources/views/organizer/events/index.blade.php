@@ -91,11 +91,6 @@
                         <!-- Actions -->
                         <td class="px-6 py-4">
                             <div class="flex items-center space-x-3">
-                                <a href="{{ route('organizer.events.show', $event->id) }}"
-                                   class="text-blue-400 hover:text-blue-300 transition"
-                                   title="View">
-                                    <i class="fas fa-eye text-lg"></i>
-                                </a>
                                 <a href="{{ route('organizer.events.edit', $event->id) }}"
                                    class="text-green-400 hover:text-green-300 transition"
                                    title="Edit">
